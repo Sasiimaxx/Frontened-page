@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Container Card -->
+    <div class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative transition-all duration-500">
+        
+        <!-- Background Glow Accents -->
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-violet-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Notification Banner / Alert Box -->
+        <div id="alertBox" class="hidden mx-6 mt-6 p-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2"></div>
+
+        <!-- Header / Logo -->
+        <div class="px-8 pt-8 pb-4 text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 mb-3 shadow-inner">
+                <i class="fa-solid fa-shield-halved text-xl"></i>
+            </div>
+            <h1 id="formTitle" class="text-2xl font-bold text-white tracking-tight">Welcome Back</h1>
+            <p id="formSubtitle" class="text-xs text-slate-400 mt-1">Please enter your details to sign in</p>
+        </div>
+
+        <!-- Form Switcher Tabs -->
+        <div class="flex mx-8 mt-2 p-1 bg-slate-950/60 rounded-xl border border-slate-800">
+            <button id="loginTabBtn" onclick="switchTab('login')" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all bg-indigo-600 text-white shadow-md">Sign In</button>
+            <button id="signupTabBtn" onclick="switchTab('signup')" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white">Create Account</button>
+        </div>
+
+        <!-- Form Body -->
+        <form id="authForm" onsubmit="handleSubmit(event)" class="p-8 pt-6 space-y-4">
+            
+            <!-- Full Name (Signup Only) -->
+            <div id="nameFieldGroup" class="space-y-1.5 hidden opacity-0 transition-opacity duration-300">
+                <label class="block text-xs font-medium text-slate-300">Full Name</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                        <i class="fa-regular fa-user text-sm"></i>
+                    </span>
+                    <input type="text" id="fullName" placeholder="John Doe" 
+                        class="w-full pl-10 pr-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                </div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="space-y-1.5">
+                <label class="block text-xs font-medium text-slate-300">Email Address</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                        <i class="fa-regular fa-envelope text-sm"></i>
+                    </span>
+                    <input type="email" id="email" required placeholder="name@example.com" 
+                        class="w-full pl-10 pr-4 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                </div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between items-center">
+                    <label class="block text-xs font-medium text-slate-300">Password</label>
+                    <a href="#" onclick="alert('Password reset link sent to your demo email!')" id="forgotPasswordLink" class="text-xs text-indigo-400 hover:text-indigo-300 transition">Forgot password?</a>
+                </div>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                        <i class="fa-solid fa-lock text-sm"></i>
+                    </span>
+                    <input type="password" id="password" required placeholder="••••••••" 
+                        class="w-full pl-10 pr-10 py-2.5 bg-slate-950/50 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+                    <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300">
+                        <i id="eyeIcon" class="fa-regular fa-eye text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Remember Me / Terms Checkbox -->
+            <div class="flex items-center justify-between text-xs pt-1">
+                <label class="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-300">
+                    <input type="checkbox" id="rememberMe" class="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900">
+                    <span id="checkboxLabel">Remember this device</span>
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 mt-2">
+                <span id="btnText">Sign In</span>
+                <i id="btnIcon" class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+
+            <!-- Divider -->
+            <div class="relative flex py-2 items-center">
+                <div class="flex-grow border-t border-slate-800"></div>
+                <span class="flex-shrink mx-4 text-slate-500 text-xs uppercase tracking-wider">Or continue with</span>
+                <div class="flex-grow border-t border-slate-800"></div>
+            </div>
+
+            <!-- Social Logins -->
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button" onclick="socialAuth('Google')" class="flex items-center justify-center gap-2 py-2.5 bg-slate-950/40 hover:bg-slate-800/60 border border-slate-800 rounded-xl text-xs font-medium text-slate-300 transition">
+                    <i class="fa-brands fa-google text-red-400"></i> Google
+                </button>
+                <button type="button" onclick="socialAuth('GitHub')" class="flex items-center justify-center gap-2 py-2.5 bg-slate-950/40 hover:bg-slate-800/60 border border-slate-800 rounded-xl text-xs font-medium text-slate-300 transition">
+                    <i class="fa-brands fa-github text-white"></i> GitHub
+                </button>
+            </div>
+        </form>
+
+        <!-- Footer Switch Link -->
+        <div class="px-8 pb-8 text-center text-xs text-slate-400">
+            <span id="switchPrompt">Don't have an account?</span> 
+            <button type="button" onclick="toggleMode()" id="switchLinkBtn" class="text-indigo-400 font-semibold hover:underline ml-1">Sign up</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        let currentMode = 'login'; // 'login' or 'signup'
+
+        function switchTab(mode) {
+            currentMode = mode;
+            const loginBtn = document.getElementById('loginTabBtn');
+            const signupBtn = document.getElementById('signupTabBtn');
+            const nameFieldGroup = document.getElementById('nameFieldGroup');
+            const formTitle = document.getElementById('formTitle');
+            const formSubtitle = document.getElementById('formSubtitle');
+            const btnText = document.getElementById('btnText');
+            const checkboxLabel = document.getElementById('checkboxLabel');
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            const switchPrompt = document.getElementById('switchPrompt');
+            const switchLinkBtn = document.getElementById('switchLinkBtn');
+
+            if (mode === 'login') {
+                loginBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all bg-indigo-600 text-white shadow-md";
+                signupBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white";
+                
+                nameFieldGroup.classList.add('hidden', 'opacity-0');
+                document.getElementById('fullName').required = false;
+
+                formTitle.innerText = "Welcome Back";
+                formSubtitle.innerText = "Please enter your details to sign in";
+                btnText.innerText = "Sign In";
+                checkboxLabel.innerText = "Remember this device";
+                forgotPasswordLink.style.display = "block";
+                switchPrompt.innerText = "Don't have an account?";
+                switchLinkBtn.innerText = "Sign up";
+            } else {
+                signupBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all bg-indigo-600 text-white shadow-md";
+                loginBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white";
+                
+                nameFieldGroup.classList.remove('hidden');
+                setTimeout(() => nameFieldGroup.classList.remove('opacity-0'), 10);
+                document.getElementById('fullName').required = true;
+
+                formTitle.innerText = "Create Account";
+                formSubtitle.innerText = "Enter your information to get started";
+                btnText.innerText = "Create Account";
+                checkboxLabel.innerText = "I agree to Terms & Conditions";
+                forgotPasswordLink.style.display = "none";
+                switchPrompt.innerText = "Already have an account?";
+                switchLinkBtn.innerText = "Sign in";
+            }
+            hideAlert();
+        }
+
+        function toggleMode() {
+            switchTab(currentMode === 'login' ? 'signup' : 'login');
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.className = "fa-regular fa-eye-slash text-sm";
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.className = "fa-regular fa-eye text-sm";
+            }
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.classList.remove('hidden');
+            if (type === 'success') {
+                alertBox.className = "mx-6 mt-6 p-3 rounded-xl text-xs font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center gap-2";
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${message}`;
+            } else {
+                alertBox.className = "mx-6 mt-6 p-3 rounded-xl text-xs font-medium bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center gap-2";
+                alertBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${message}`;
+            }
+        }
+
+        function hideAlert() {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.classList.add('hidden');
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Simple validation simulation
+            if (password.length < 6) {
+                showAlert('Password must be at least 6 characters long.', 'error');
+                return;
+            }
+
+            // Simulate loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-xs"></i> Processing...`;
+
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span id="btnText">${currentMode === 'login' ? 'Sign In' : 'Create Account'}</span><i class="fa-solid fa-arrow-right text-xs"></i>`;
+                
+                if (currentMode === 'login') {
+                    showAlert(`Successfully signed in as ${email}! Redirecting...`, 'success');
+                } else {
+                    showAlert(`Account successfully created for ${email}! You can now log in.`, 'success');
+                    setTimeout(() => switchTab('login'), 1500);
+                }
+            }, 1000);
+        }
+
+        function socialAuth(provider) {
+            showAlert(`Redirecting to ${provider} authentication...`, 'success');
+        }
+    </script>
+</body>
+</html>
